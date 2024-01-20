@@ -17,20 +17,20 @@ public class FavoriteMoviesManager extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-        private static List<Integer> favoriteMovieIds = new ArrayList<>();
+    private static List<Integer> favoriteMovieIds = new ArrayList<>();
 
-        public static void addFavoriteMovie(int movieId) {
-            if (!favoriteMovieIds.contains(movieId)) {
-                favoriteMovieIds.add(movieId);
-            }
+    public static void addFavoriteMovie(int movieId) {
+        if (!favoriteMovieIds.contains(movieId)) {
+            favoriteMovieIds.add(movieId);
         }
+    }
 
-        public static void removeFavoriteMovie(int movieId) {
-            favoriteMovieIds.remove(Integer.valueOf(movieId));
-        }
+    public static void removeFavoriteMovie(int movieId) {
+        favoriteMovieIds.remove(Integer.valueOf(movieId));
+    }
 
-        public static List<Integer> getFavoriteMovies() {
-            return favoriteMovieIds;
-        }
+    public static List<Integer> getFavoriteMovies() {
+        return favoriteMovieIds;
+    }
 
 }
