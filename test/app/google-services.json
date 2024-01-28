@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "672512085694",
+    "project_id": "loginregister-34ec8",
+    "storage_bucket": "loginregister-34ec8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:672512085694:android:dba09ba9c85419f1d2d8ef",
+        "android_client_info": {
+          "package_name": "com.example.BTL"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBptkXvsXAyKDy_sGPq-c1ZFrHNjk0f5pc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
