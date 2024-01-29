@@ -1,13 +1,10 @@
-
 package com.example.BTL.Domain;
-
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 
 public class FilmItem {
-
     @SerializedName("id")
     @Expose
     private Integer id;

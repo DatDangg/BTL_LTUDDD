@@ -2,9 +2,9 @@ package com.example.BTL.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.widget.NestedScrollView;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -23,6 +23,8 @@ import com.bumptech.glide.Glide;
 import com.example.BTL.Domain.FilmItem;
 import com.example.BTL.R;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 
 
@@ -34,7 +36,7 @@ public class DetailActivity extends AppCompatActivity {
     private int idFilm;
     private ImageView pic2, backImg;
     private NestedScrollView scrollView;
-
+    SharedPreferences sharedPreferences;
     private FilmItem item;
 
     @Override
@@ -48,10 +50,20 @@ public class DetailActivity extends AppCompatActivity {
 
         View imageView5 = findViewById(R.id.imageView5);
         imageView5.setOnClickListener(v -> {
-            FavoriteMoviesManager.addFavoriteMovie(idFilm);
-            Toast.makeText(DetailActivity.this, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show();
-        });
+            String username = sharedPreferences.getString("username", "");
 
+            if (!username.isEmpty()) {
+                addFavoriteMovie(username, idFilm);
+            } else {
+                Toast.makeText(DetailActivity.this, "Bạn cần đăng nhập trước khi thêm film yêu thích", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void addFavoriteMovie(String username, int idFilm) {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://loginregister-34ec8-default-rtdb.firebaseio.com");
+        databaseReference.child("users").child(username).child("favorite_movies").child(String.valueOf(idFilm)).setValue(true);
+        Toast.makeText(DetailActivity.this, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show();
     }
 
     private void sendRequest() {
@@ -63,7 +75,7 @@ public class DetailActivity extends AppCompatActivity {
             Gson gson = new Gson();
             scrollView.setVisibility(View.VISIBLE);
             loading.setVisibility(View.GONE);
-            item = gson.fromJson(response, FilmItem.class); // Fix: Use the member variable
+            item = gson.fromJson(response, FilmItem.class);
 
             Glide.with(DetailActivity.this)
                     .load(item.getPoster())
@@ -74,6 +86,7 @@ public class DetailActivity extends AppCompatActivity {
         }, error -> loading.setVisibility(View.GONE));
         mRequestQueue.add(mStringRequest);
     }
+
     private void openMovieLink() {
         if (item != null && item.getFilm() != null) {
             String movieLink = item.getFilm();
@@ -84,9 +97,8 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
-
-
     private void initView() {
+        sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         titleTxt = findViewById(R.id.movieNameTxt);
         scrollView = findViewById(R.id.scrollView3);
         pic2 = findViewById(R.id.picDetail);

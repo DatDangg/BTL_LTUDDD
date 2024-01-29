@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -19,38 +20,39 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
-    DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://loginregister-34ec8-default-rtdb.firebaseio.com/");
+    SharedPreferences sharedPreferences;
+    DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://loginregister-34ec8-default-rtdb.firebaseio.com");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        final EditText phone=findViewById(R.id.username);
+        final EditText idname=findViewById(R.id.username);
         final EditText password=findViewById(R.id.password);
         final Button loginBtn=findViewById(R.id.loginBtn);
         final TextView registerNowBtn=findViewById(R.id.registerNowBtn);
-
+        sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final String phoneTxt = phone.getText().toString();
+                final String username = idname.getText().toString();
                 final String passwordTxt=password.getText().toString();
 
-                if(phoneTxt.isEmpty()||passwordTxt.isEmpty()){
+                if(username.isEmpty()||passwordTxt.isEmpty()){
                     Toast.makeText(LoginActivity.this,"Please enter your username or password",Toast.LENGTH_SHORT).show();
                 }
                 else {
                     databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            //check if mobile/phone is exist in firebase database
-                            if(snapshot.hasChild(phoneTxt)){
-                                //mobile is exist in firebase database
-                                //now get password of user from firebase data and match it user entered password
-                                final  String getPassword=snapshot.child(phoneTxt).child("password").getValue(String.class);
+                            if(snapshot.hasChild(username)){
+                                final  String getPassword=snapshot.child(username).child("password").getValue(String.class);
                                 if (getPassword.equals(passwordTxt)){
                                     Toast.makeText(LoginActivity.this, "Successfully logged in", Toast.LENGTH_SHORT).show();
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putString("username", username);
+                                    editor.apply();
 
-                                    //open MainActivity on success
                                     startActivity(new Intent(LoginActivity.this,MainActivity.class));
                                     finish();
                                 }

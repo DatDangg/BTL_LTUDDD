@@ -1,6 +1,9 @@
 package com.example.BTL.Adapters;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +18,10 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.example.BTL.Activities.DetailActivity;
-import com.example.BTL.Activities.FavoriteMoviesManager;
 import com.example.BTL.Domain.FilmItem;
 import com.example.BTL.R;
-//import com.example.BTL.Utils.NetworkUtils;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 
 import java.util.List;
@@ -41,20 +44,37 @@ public class FavoriteListAdapter extends RecyclerView.Adapter<FavoriteListAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         int filmId = favoriteMovieIds.get(position);
-        // Thực hiện request để lấy thông tin phim
-        String apiUrl = "https://moviesapi.ir/api/v1/movies/" + filmId;
+        loadMovieData(filmId, holder);
+    }
+    private void loadMovieData(int filmId, ViewHolder holder) {
+        String apiUrl = "https://movielistjava.000webhostapp.com/" + filmId;
+
         StringRequest request = new StringRequest(Request.Method.GET, apiUrl, response -> {
-            // Parse dữ liệu từ JSON response
             Gson gson = new Gson();
             FilmItem filmItem = gson.fromJson(response, FilmItem.class);
 
-            // Hiển thị dữ liệu lên ViewHolder
             holder.bind(filmItem);
+
+            holder.textViewRemove.setOnClickListener(v -> {
+
+                int position = holder.getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    int filmIdToRemove = favoriteMovieIds.get(position);
+
+                    SharedPreferences sharedPreferences = holder.itemView.getContext().getSharedPreferences("MyPrefs", MODE_PRIVATE);
+                    String userId = sharedPreferences.getString("username", "");
+                    DatabaseReference favoriteMoviesRef = FirebaseDatabase.getInstance().getReference()
+                            .child("users").child(userId).child("favorite_movies").child(String.valueOf(filmIdToRemove));
+                    favoriteMoviesRef.removeValue();
+
+                    favoriteMovieIds.remove(position);
+                    notifyItemRemoved(position);
+                }
+            });
         }, error -> {
             // Xử lý lỗi khi request không thành công
         });
 
-        // Thêm request vào hàng đợi của Volley
         Volley.newRequestQueue(holder.itemView.getContext()).add(request);
     }
 
@@ -63,12 +83,10 @@ public class FavoriteListAdapter extends RecyclerView.Adapter<FavoriteListAdapte
         return favoriteMovieIds.size();
     }
 
-    // Trong ViewHolder
-    // Trong ViewHolder
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView textViewFilmTitle;
         ImageView imageViewFilmPoster;
-        TextView textViewRemove; // Thêm ImageView để xóa yêu thích
+        TextView textViewRemove;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -76,22 +94,6 @@ public class FavoriteListAdapter extends RecyclerView.Adapter<FavoriteListAdapte
             textViewFilmTitle = itemView.findViewById(R.id.fvTV);
             textViewRemove = itemView.findViewById(R.id.textViewRemove); // ID của ImageView để xóa yêu thích
 
-            // Thêm listener cho imageViewRemove
-            textViewRemove.setOnClickListener(v -> {
-                int position = getBindingAdapterPosition(); // Sử dụng getBindingAdapterPosition() thay vì getAdapterPosition()
-                if (position != RecyclerView.NO_POSITION) {
-                    int filmId = favoriteMovieIds.get(position);
-
-                    // Gọi phương thức removeFavoriteMovie để xóa phim khỏi danh sách yêu thích
-                    FavoriteMoviesManager.removeFavoriteMovie(filmId);
-
-                    // Cập nhật lại danh sách yêu thích và thông báo cho Adapter cập nhật giao diện
-                    favoriteMovieIds = FavoriteMoviesManager.getFavoriteMovies();
-                    notifyDataSetChanged(); // Gọi phương thức này để cập nhật giao diện
-                }
-            });
-
-// Thêm listener cho imageViewFilmPoster
             imageViewFilmPoster.setOnClickListener(v -> {
                 int position = getBindingAdapterPosition(); // Sử dụng getBindingAdapterPosition() thay vì getAdapterPosition()
                 if (position != RecyclerView.NO_POSITION) {
@@ -105,19 +107,14 @@ public class FavoriteListAdapter extends RecyclerView.Adapter<FavoriteListAdapte
                     itemView.getContext().startActivity(intent);
                 }
             });
-
         }
 
         public void bind(FilmItem filmItem) {
-            // Hiển thị thông tin phim lên ViewHolder
             textViewFilmTitle.setText(filmItem.getTitle());
 
-            // Sử dụng Glide để hiển thị hình ảnh từ URL
             Glide.with(itemView.getContext())
                     .load(filmItem.getPoster())
                     .into(imageViewFilmPoster);
         }
     }
-
-
 }

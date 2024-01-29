@@ -49,14 +49,10 @@ public class RegisterActivity extends AppCompatActivity {
                     databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            //check if phone is not registered before
                             if(snapshot.hasChild(phoneTxt)){
                                 Toast.makeText(RegisterActivity.this, "Phone is already registered", Toast.LENGTH_SHORT).show();
                             }
                             else{
-                                //sending data to firebase Realtime Database.
-                                //We are using phone number as unique identity of every user.
-                                // so all the other details of user comes under phone number
                                 databaseReference.child("users").child(phoneTxt).child("fullname").setValue(fullnameTxt);
                                 databaseReference.child("users").child(phoneTxt).child("email").setValue(emailTxt);
                                 databaseReference.child("users").child(phoneTxt).child("password").setValue(passwordTxt);
@@ -83,5 +79,4 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
     }
-
 }

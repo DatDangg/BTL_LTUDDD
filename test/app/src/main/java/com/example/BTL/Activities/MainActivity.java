@@ -3,12 +3,10 @@ package com.example.BTL.Activities;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
@@ -42,8 +40,8 @@ public class MainActivity extends AppCompatActivity {
     private void sendRequestBtn() {
         LinearLayout favBtn = findViewById(R.id.FavBTN);
         favBtn.setOnClickListener(v -> startActivity(new Intent(MainActivity.this,FavoriteActivity.class)));
-//        LinearLayout ProBtn = findViewById(R.id.ProBTN);
-//        ProBtn.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, ProfileActivity.class)));
+        LinearLayout ProBtn = findViewById(R.id.ProBTN);
+        ProBtn.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, ProfileActivity.class)));
     }
 
     private void sendRequestBestMovies() {
@@ -76,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
         mRequestQueue.add(mStringRequest2);
     }
 
-
     private void initView() {
         recyclerViewBestMovies = findViewById(R.id.view1);
         recyclerViewBestMovies.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -84,7 +81,5 @@ public class MainActivity extends AppCompatActivity {
         recyclerviewPaidMovies.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         loading1 = findViewById(R.id.progressBar1);
         loading2 = findViewById(R.id.progressBar2);
-
-
     }
 }
