@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.BTL'
+    namespace 'com.example.MoviesApp'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.example.BTL"
+        applicationId "com.example.MoviesApp"
         minSdk 24
         targetSdk 34
         versionCode 1
